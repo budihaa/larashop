@@ -14,3 +14,13 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+# Disable register routes, redirect to login when someone accessing it.
+Route::match(["GET", "POST"], "/register", function(){
+    return redirect("/login");
+})->name("register");
+
+
+Route::get('/home', 'HomeController@index')->name('home');
