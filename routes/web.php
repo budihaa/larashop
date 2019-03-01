@@ -11,16 +11,17 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes();
 
 # Disable register routes, redirect to login when someone accessing it.
-Route::match(["GET", "POST"], "/register", function(){
-    return redirect("/login");
-})->name("register");
+Route::match(['GET', 'POST'], '/register', function(){
+    return redirect('/login');
+})->name('register');
 
+# Resource Controller
+Route::resource('users', 'UserController');
 
+Route::get('/', function () {
+    return view('auth.login');
+});
 Route::get('/home', 'HomeController@index')->name('home');
