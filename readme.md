@@ -1,4 +1,4 @@
-# This project is my exercise for learning Laravel & VueJS from this (https://buku-laravel-vue.com/ "E-book!")
+# This project is my exercise for learning Laravel & VueJS from this [E-book!](https://buku-laravel-vue.com/ "Buku Laravel Vue E-book")
 
 ## Reach me on
 ### Instagram <a href="https://www.instagram.com/budihaa" target="_blank">@budihaa</a>
