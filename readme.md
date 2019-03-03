@@ -1,3 +1,9 @@
+# This project is my exercise for learning Laravel & VueJS from this <a href="https://buku-laravel-vue.com/" target="_blank>E-book!</a>
+
+## Reach me on
+### Instagram <a href="https://www.instagram.com/budihaa" target="_blank">@budihaa</a>
+### Facebook <a href="https://www.facebook.com/profile.php?id=100008474478456" target="_blank">Budi Haryono</a>
+
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
 
 <p align="center">

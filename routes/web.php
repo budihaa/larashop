@@ -14,7 +14,7 @@
 Auth::routes();
 
 # Disable register routes, redirect to login when someone accessing it.
-Route::match(['GET', 'POST'], '/register', function(){
+Route::match(['GET', 'POST'], '/register', function() {
     return redirect('/login');
 })->name('register');
 
@@ -26,6 +26,10 @@ Route::delete('/categories/{id}/permanent-delete', 'CategoryController@permanent
 # Resource Controller
 Route::resource('users', 'UserController');
 Route::resource('categories', 'CategoryController');
+Route::resource('books', 'BookController');
+
+# Ajax search select2 for categories
+Route::get('/ajax/categories/search', 'CategoryController@ajaxSearch')->name('categories.ajaxSearch');
 
 Route::get('/', function () {
     return view('auth.login');

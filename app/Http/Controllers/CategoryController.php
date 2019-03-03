@@ -28,6 +28,20 @@ class CategoryController extends Controller
     }
 
     /**
+     * Search category in create book page
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function ajaxSearch(Request $request)
+    {
+        $keyword = $request->get('q');
+        $categories = Category::where("name", "LIKE", "%$keyword%")->get();
+
+        return $categories;
+    }
+
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
