@@ -13,9 +13,24 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $users = User::paginate(10);
+
+        $status = $request->get('status');
+        $filterKeyword = $request->get('keyword');
+
+        if ($status) {
+            $users = User::where('status', $status)->paginate(10);
+        }
+
+        if ($filterKeyword) {
+            if ($status) {
+                $users = User::where('email', 'LIKE', "%$filterKeyword%")->where('status', $status)->paginate(10);
+            } else {
+                $users = User::where('email', 'LIKE', "%$filterKeyword%")->paginate(10);
+            }
+        }
 
         return view('users.index', ['users' => $users]);
     }
@@ -46,7 +61,7 @@ class UserController extends Controller
         $user->address = $request->get('address');
         $user->phone = $request->get('phone');
         $user->email = $request->get('email');
-        $user->password = \Hash::make($request->get('password'));
+        $user->password = Hash::make($request->get('password'));
 
         # Checking avatar img
         if ($request->file('avatar')) {
@@ -89,7 +104,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+        * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id

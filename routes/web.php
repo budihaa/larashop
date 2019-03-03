@@ -18,8 +18,14 @@ Route::match(['GET', 'POST'], '/register', function(){
     return redirect('/login');
 })->name('register');
 
+# Recycle bin
+Route::get('/categories/trash', 'CategoryController@trash')->name('categories.trash');
+Route::get('/categories/{id}/restore', 'CategoryController@restore')->name('categories.restore');
+Route::delete('/categories/{id}/permanent-delete', 'CategoryController@permanentDelete')->name('categories.permanent-delete');
+
 # Resource Controller
 Route::resource('users', 'UserController');
+Route::resource('categories', 'CategoryController');
 
 Route::get('/', function () {
     return view('auth.login');
