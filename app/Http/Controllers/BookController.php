@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Book;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -13,9 +12,28 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $books = Book::with('categories');
+
+        $keyword = $request->get('keyword');
+        $status = $request->get('status');
+
+        // dd($keyword);
+
+        if ($keyword) {
+            $books = $books->where('title', "%$keyword%");
+        }
+
+        // dd($books);
+
+        // if ($status) {
+        //     $books = $books->where('status', strtoupper($status));
+        // }
+
+        $books = $books->paginate(10);
+
+        return view('books.index', compact('books'));
     }
 
     /**
@@ -45,13 +63,16 @@ class BookController extends Controller
         $book->stock = $request->get('stock');
         $book->status = $request->get('save_action');
         $book->slug = str_slug($request->get('title'));
-        $book->created_by = Auth::user()->id;
+        $book->created_by = \Auth::user()->id;
         $cover = $request->file('cover');
         if ($cover) {
             $cover_path = $cover->store('book-covers', 'public');
             $book->cover = $cover_path;
         }
         $book->save();
+
+        # Relationship
+        $book->categories()->attach($request->get('categories'));
 
         $status = $book->status === 'PUBLISH' ? 'Book successfully saved and published' : 'Book saved as draft';
 
@@ -75,9 +96,11 @@ class BookController extends Controller
      * @param  \App\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function edit(Book $book)
+    public function edit($id)
     {
-        //
+        $book = Book::findOrFail($id);
+
+        return view('books.edit', compact('book'));
     }
 
     /**
@@ -87,9 +110,34 @@ class BookController extends Controller
      * @param  \App\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Book $book)
+    public function update(Request $request, $id)
     {
-        //
+        $book = Book::findOrFail($id);
+
+        $book->title = $request->input('title');
+        $book->slug = $request->input('slug');
+        $book->description = $request->input('description');
+        $book->author = $request->input('author');
+        $book->publisher = $request->input('publisher');
+        $book->stock = $request->input('stock');
+        $book->price = $request->input('price');
+
+        $cover = $request->file('cover');
+        if ($cover) {
+            if ($book->cover && file_exists(storage_path('app/public/' . $book->cover))) {
+                Storage::delete('public/'. $book->cover);
+            }
+            $new_cover_path = $cover->store('book-covers', 'public');
+            $book->cover = $new_cover_path;
+       }
+
+       $book->updated_by = Auth::user()->id;
+       $book->status = $request->input('status');
+       $book->save();
+
+       $book->categories()->sync($request->input('categories'));
+
+       return redirect()->route('books.edit', ['id'=>$book->id])->with('status', 'Book successfully updated');
     }
 
     /**
@@ -98,8 +146,37 @@ class BookController extends Controller
      * @param  \App\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Book $book)
+    public function destroy($id)
     {
-        //
+        $book = Book::findOrFail($id);
+        $book->delete();
+
+        return redirect()->route('books.index')->with('status', "Book successfully moved to trash");
     }
+
+    public function trash()
+    {
+        $books = Book::onlyTrashed()->paginate(10);
+
+        return view('books.trash', ['books' => $books]);
+    }
+
+    public function restore($id)
+    {
+        $book = Book::withTrashed()->findOrFail($id);
+        $book->restore();
+
+        return redirect()->route('books.trash')->with('status', 'Book successfully restored');
+    }
+
+    public function PermanentDelete($id)
+    {
+        $book = Book::withTrashed()->findOrFail($id);
+
+        $book->categories()->detach(); # Remove relation
+        $book->forceDelete();
+
+        return redirect()->route('books.trash')->with('status', 'Book permanently deleted!');
+    }
+
 }
