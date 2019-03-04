@@ -19,17 +19,13 @@ class BookController extends Controller
         $keyword = $request->get('keyword');
         $status = $request->get('status');
 
-        // dd($keyword);
-
         if ($keyword) {
-            $books = $books->where('title', "%$keyword%");
+            $books = $books->where('title', 'LIKE', "%$keyword%");
         }
 
-        // dd($books);
-
-        // if ($status) {
-        //     $books = $books->where('status', strtoupper($status));
-        // }
+        if ($status) {
+            $books = $books->where('status', strtoupper($status));
+        }
 
         $books = $books->paginate(10);
 
